@@ -418,10 +418,14 @@ menu = st.sidebar.radio(
 
 st.sidebar.markdown("---")
 st.sidebar.success("Model: Vision Transformer")
-st.sidebar.write("Accuracy: **99.83%**")
-st.sidebar.write("Precision: **99.83%**")
-st.sidebar.write("Recall: **99.83%**")
-st.sidebar.write("F1-Score: **99.83%**")
+
+st.sidebar.markdown("""
+### 🧠 Sejarah Singkat
+
+Vision Transformer (ViT) diperkenalkan oleh Google Research pada tahun 2020.  
+Model ini memproses citra dalam bentuk patch dan menggunakan mekanisme self-attention untuk mengenali pola visual.
+""")
+
 st.sidebar.markdown("---")
 st.sidebar.caption("Tips: gunakan foto biji kopi yang jelas, cukup cahaya, dan tidak blur. Jangan upload foto mantan, modelnya trauma.")
 
