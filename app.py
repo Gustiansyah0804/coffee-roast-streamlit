@@ -15,6 +15,12 @@ st.set_page_config(
 MODEL_PATH = "best_vit_coffee_roast_final.pth"
 CLASS_NAMES = ["Dark", "Light", "Medium"]
 
+SAMPLE_IMAGES = {
+    "Light": "light (2).png",
+    "Medium": "medium (5).png",
+    "Dark": "dark (2).png",
+}
+
 @st.cache_resource
 def load_model():
     model = timm.create_model(
@@ -598,17 +604,58 @@ elif menu == "📊 Informasi Model":
     st.markdown("### Informasi Model dan Evaluasi")
 
     m1, m2, m3, m4 = st.columns(4)
-    for col, label in zip([m1, m2, m3, m4], ["Accuracy", "Precision", "Recall", "F1-Score"]):
+    metric_cards = [
+        ("99.83%", "Accuracy"),
+        ("599", "Data Uji"),
+        ("3", "Kelas Roasting"),
+        ("ViT", "Arsitektur Model"),
+    ]
+    for col, (num, label) in zip([m1, m2, m3, m4], metric_cards):
         with col:
-            st.markdown(f'<div class="metric-card"><div class="metric-number">99.83%</div><div class="metric-label">{label}</div></div>', unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="metric-card"><div class="metric-number">{num}</div><div class="metric-label">{label}</div></div>',
+                unsafe_allow_html=True
+            )
 
     st.write("")
+    st.markdown("### Classification Report per Kelas")
+
+    report_df = pd.DataFrame({
+        "Kelas": ["Dark", "Light", "Medium", "Macro Avg", "Weighted Avg"],
+        "Precision": [1.0000, 1.0000, 0.9944, 0.9981, 0.9983],
+        "Recall": [0.9955, 1.0000, 1.0000, 0.9985, 0.9983],
+        "F1-Score": [0.9977, 1.0000, 0.9972, 0.9983, 0.9983],
+        "Support": [221, 199, 179, 599, 599]
+    })
+
+    st.dataframe(
+        report_df.style.format({
+            "Precision": "{:.4f}",
+            "Recall": "{:.4f}",
+            "F1-Score": "{:.4f}",
+            "Support": "{:.0f}"
+        }),
+        use_container_width=True
+    )
+
+    st.caption(
+        "Nilai precision, recall, dan F1-score ditampilkan per kelas agar evaluasi tidak hanya bergantung pada nilai global."
+    )
+
+    st.markdown("### Contoh Citra Biji Kopi per Kelas")
+    img1, img2, img3 = st.columns(3)
+    for col, key in zip([img1, img2, img3], ["Light", "Medium", "Dark"]):
+        with col:
+            st.image(SAMPLE_IMAGES[key], caption=f"Contoh {key} Roast", use_container_width=True)
+            st.markdown(f"**{ROAST_INFO[key]['title']}**")
+            st.write(ROAST_INFO[key]["desc"])
+
+    st.markdown("### Ringkasan Metrik Global")
     metrics = pd.DataFrame({
-        "Metrik": ["Accuracy", "Precision", "Recall", "F1-Score"],
+        "Metrik": ["Accuracy", "Precision Weighted", "Recall Weighted", "F1-Score Weighted"],
         "Nilai": [0.9983, 0.9983, 0.9983, 0.9983]
     })
     st.dataframe(metrics, use_container_width=True)
-    st.bar_chart(metrics.set_index("Metrik"))
 
     st.markdown("""
     <div class="dark-card">
